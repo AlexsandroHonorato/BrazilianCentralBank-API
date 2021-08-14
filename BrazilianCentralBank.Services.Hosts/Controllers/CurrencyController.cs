@@ -15,24 +15,39 @@ using BrazilianCentralBank.Application.ViewModels;
 using BrazilianCentralBank.Application.Helper;
 
 namespace BrazilianCentralBank.Services.Hosts.Controllers {
-    [Route("api/[controller]")]
+    /// <summary>
+    /// 
+    /// </summary>
+
     [ApiController]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [Authorize(AuthenticationSchemes = "Bearer")]  
     public class CurrencyController : ControllerBase {
+
         private readonly ICurrencyServices _currencyServices;
         private readonly IMapper _mapper;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="currencyServices"></param>
+        /// <param name="mapper"></param>
         public CurrencyController(ICurrencyServices currencyServices, IMapper mapper) {
             this._currencyServices = currencyServices;
             this._mapper = mapper;
         }
-
-        [HttpPost("AccessToken")]
+        /// <summary>
+        /// Metodo responsável para gerar o Token de Acesso
+        /// </summary>
+        /// <param name="Simbolo">USD</param>
+        /// <returns></returns>
+        [HttpGet("AccessToken")]     
         [AllowAnonymous]
-        public async Task<IActionResult> AccessToken([FromBody] CurrencyCommand currencyCommand) {
+        public async Task<IActionResult> AccessToken(string Simbolo) {
             try {
 
-                CurrencyViewModel currencyModel = this._mapper.Map<CurrencyViewModel>(currencyCommand);
+                CurrencyViewModel currencyModel = this._mapper.Map<CurrencyViewModel>(new CurrencyCommand { Simbolo = Simbolo });
 
                 AuthResponseObjHelper authResult = await this._currencyServices.AuthenticateSevice(currencyModel);
 
@@ -47,8 +62,12 @@ namespace BrazilianCentralBank.Services.Hosts.Controllers {
             }
         }
 
+        /// <summary>
+        /// Metodo responsável por trazer as informações das moedas 
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("Moedas")]
-        [Authorize]
+        [Authorize]     
         public async Task<IActionResult> CurrencyType() {
             try { 
 

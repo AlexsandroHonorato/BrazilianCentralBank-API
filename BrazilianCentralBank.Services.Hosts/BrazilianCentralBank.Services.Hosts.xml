@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>BrazilianCentralBank.Services.Hosts</name>
+    </assembly>
+    <members>
+        <member name="T:BrazilianCentralBank.Services.Hosts.Command.CurrencyCommand">
+            <summary>
+            Camando para pegar os dados das moedas 
+            </summary>
+        </member>
+        <member name="P:BrazilianCentralBank.Services.Hosts.Command.CurrencyCommand.Simbolo">
+            <summary>
+            Simbolo da moeda
+            </summary>
+        </member>
+        <member name="T:BrazilianCentralBank.Services.Hosts.Controllers.CurrencyController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:BrazilianCentralBank.Services.Hosts.Controllers.CurrencyController.#ctor(BrazilianCentralBank.Application.Interfaces.ICurrencyServices,AutoMapper.IMapper)">
+            <summary>
+            
+            </summary>
+            <param name="currencyServices"></param>
+            <param name="mapper"></param>
+        </member>
+        <member name="M:BrazilianCentralBank.Services.Hosts.Controllers.CurrencyController.AccessToken(System.String)">
+            <summary>
+            Metodo responsável para gerar o Token de Acesso
+            </summary>
+            <param name="Simbolo">USD</param>
+            <returns></returns>
+        </member>
+        <member name="M:BrazilianCentralBank.Services.Hosts.Controllers.CurrencyController.CurrencyType">
+            <summary>
+            Metodo responsável por trazer as informações das moedas 
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:BrazilianCentralBank.Services.Hosts.Controllers.CurrencyQuotationController">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:BrazilianCentralBank.Services.Hosts.Controllers.CurrencyQuotationController.#ctor(BrazilianCentralBank.Application.Interfaces.ICurrencyQuotationServices,AutoMapper.IMapper)">
+            <summary>
+            
+            </summary>
+            <param name="currencyQuotationServices"></param>
+            <param name="mapper"></param>
+        </member>
+        <member name="M:BrazilianCentralBank.Services.Hosts.Controllers.CurrencyQuotationController.CurrencyType(System.String,System.String,System.String)">
+            <summary>
+            Metodo responsável por trazer a taxa de câmbio, filtrando por tipo da moeda "USD" e Data da pesquisa "14-08-2021"
+            É necessário o Tokem de Acesso para essa consulta
+            </summary>
+            <param name="Simbolo">USD</param>
+            <param name="DataInicial">14-08-2021</param>
+            <param name="DataFinal">14-08-2021</param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

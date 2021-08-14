@@ -4,10 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace BrazilianCentralBank.Services.Hosts.Command {
-    public class CurrencyCommand {
-        public string Id { get; set; }
+    /// <summary>
+    /// Camando para pegar os dados das moedas 
+    /// </summary>
+    public class CurrencyCommand {     
+        /// <summary>
+        /// Simbolo da moeda
+        /// </summary>
         public string Simbolo { get; set; }
-        public string NomeFormatado { get; set; }
-        public string TipoMoeda { get; set; }
+   
     }
 }

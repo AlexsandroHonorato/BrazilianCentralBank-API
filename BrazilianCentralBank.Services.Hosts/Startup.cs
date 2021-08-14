@@ -12,9 +12,13 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+
+using System.IO;
 using AutoMapper;
+using System.Reflection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 
 using BrazilianCentralBank.Infrastructure.Data.Interfaces;
 using BrazilianCentralBank.Infrastructure.Data.Base;
@@ -24,6 +28,7 @@ using BrazilianCentralBank.Application.ViewModels;
 using BrazilianCentralBank.Application.Interfaces;
 using BrazilianCentralBank.Application;
 using BrazilianCentralBank.Services.Hosts.Command;
+
 
 namespace BrazilianCentralBank.Services.Hosts {
     public class Startup {
@@ -38,6 +43,7 @@ namespace BrazilianCentralBank.Services.Hosts {
             ConfigureTokenJWT(services);
             ConfigureDI(services);
             ConfigureAutoMapper(services);
+            ConfigureSwagger(services);
             services.AddControllers();
             services.AddCors(options => options.AddPolicy("Cors", builder => {
                 builder.AllowAnyOrigin();
@@ -63,7 +69,7 @@ namespace BrazilianCentralBank.Services.Hosts {
         }
 
         private void ConfigureDI(IServiceCollection services) {
-            services.AddSingleton<IRepositoryBase>(ctx => new RepositoryBase(connectionString: Configuration.GetConnectionString("DbConnection")));  
+            services.AddSingleton<IRepositoryBase>(ctx => new RepositoryBase(connectionString: Configuration.GetConnectionString("DbConnection")));
             services.AddScoped<ICurrencyQuotationRepository, CurrencyQuotationRepository>();
             services.AddScoped<ICurrencyQuotationServices, CurrencyQuotationServices>();
             services.AddScoped<ICurrencyRepository, CurrencyRepository>();
@@ -82,11 +88,54 @@ namespace BrazilianCentralBank.Services.Hosts {
             IMapper mapper = AutoMapperConfig.CreateMapper();
 
             services.AddSingleton(mapper);
+        }
 
+        private void ConfigureSwagger(IServiceCollection services) {
+
+            services.AddVersionedApiExplorer(options => {
+                options.GroupNameFormat = "'v'VVV";
+                options.SubstituteApiVersionInUrl = true;
+            })
+          .AddApiVersioning(options => {
+              options.DefaultApiVersion = new ApiVersion(1, 0);
+              options.AssumeDefaultVersionWhenUnspecified = true;
+              options.ReportApiVersions = true;
+          });
+
+            var apiProviderDescription = services.BuildServiceProvider().GetService<IApiVersionDescriptionProvider>();
+
+            services.AddSwaggerGen(options => {
+
+                foreach (var descriptionVersion in apiProviderDescription.ApiVersionDescriptions) {
+
+                    options.SwaggerDoc(descriptionVersion.GroupName, new Microsoft.OpenApi.Models.OpenApiInfo() {
+                        Title = "Banco Central do Brasil API",
+                        Version = descriptionVersion.ApiVersion.ToString(),
+                        TermsOfService = new Uri("http://ArquiVaiSeusTermosDeUso.com.br"),
+                        Description = "API Desenvolvida Para Pegar as Taxas de Cotações",
+                        License = new Microsoft.OpenApi.Models.OpenApiLicense {
+                            Name = "BancoCentralDoBrasil License",
+                            Url = new Uri("http://minhaslicensas.com")
+                        },
+                        Contact = new Microsoft.OpenApi.Models.OpenApiContact {
+                            Name = "Desenvolvido por Alexsandro Honorato",
+                            Email = "alexsandrohonorato@gmail.com",
+                            Url = new Uri("https://www.linkedin.com/in/alexsandro-honorato-da-silva-62480825/")
+                        }
+                    });
+                }
+
+                var xmlCommentsFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlCommentsFullPath = Path.Combine(AppContext.BaseDirectory, xmlCommentsFile);
+
+                options.IncludeXmlComments(xmlCommentsFullPath);
+
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env) {
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider apiVersionDescriptionProvider) {
+
             if (env.IsDevelopment()) {
                 app.UseDeveloperExceptionPage();
             }
@@ -100,6 +149,15 @@ namespace BrazilianCentralBank.Services.Hosts {
             app.UseAuthorization();
 
             app.UseAuthentication();
+
+            app.UseSwagger()
+                .UseSwaggerUI(options => {
+                    foreach (var descriptionVersion in apiVersionDescriptionProvider.ApiVersionDescriptions) {
+                        options.SwaggerEndpoint($"/Swagger/{descriptionVersion.GroupName}/swagger.json", descriptionVersion.GroupName.ToLowerInvariant());
+                    }
+
+                    options.RoutePrefix = "";
+                });
 
             app.UseEndpoints(endpoints => {
                 endpoints.MapControllers();

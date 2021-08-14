@@ -14,24 +14,42 @@ using BrazilianCentralBank.Services.Hosts.Command;
 using BrazilianCentralBank.Application.ViewModels;
 
 namespace BrazilianCentralBank.Services.Hosts.Controllers {
-    [Route("api/[controller]")]
+    /// <summary>
+    /// 
+    /// </summary>
     [ApiController]
+    [ApiVersion("2.0")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [Authorize(AuthenticationSchemes = "Bearer")]
     public class CurrencyQuotationController : ControllerBase {
         ICurrencyQuotationServices _currencyQuotationServices;
         IMapper _mapper;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="currencyQuotationServices"></param>
+        /// <param name="mapper"></param>
         public CurrencyQuotationController(ICurrencyQuotationServices currencyQuotationServices, IMapper mapper) {
             this._currencyQuotationServices = currencyQuotationServices;
             this._mapper = mapper;
         }
 
-        [HttpPost("Cambio")]
+        /// <summary>
+        /// Metodo responsável por trazer a taxa de câmbio, filtrando por tipo da moeda "USD" e Data da pesquisa "14-08-2021"
+        /// É necessário o Tokem de Acesso para essa consulta
+        /// </summary>
+        /// <param name="Simbolo">USD</param>
+        /// <param name="DataInicial">14-08-2021</param>
+        /// <param name="DataFinal">14-08-2021</param>
+        /// <returns></returns>
+        [HttpGet("Cambio")]
         [Authorize]
-        public async Task<IActionResult> CurrencyType(CurrencyQuotationCommand quotationCommand) {
+        public async Task<IActionResult> CurrencyType(string Simbolo, string DataInicial, string DataFinal) {
             try {
 
-                CurrencyQuotationViewModel currencyQuotationModel = this._mapper.Map<CurrencyQuotationViewModel>(quotationCommand);
+                CurrencyQuotationViewModel currencyQuotationModel = this._mapper.Map<CurrencyQuotationViewModel>(
+                    new CurrencyQuotationCommand { Simbolo = Simbolo, DataInicial = DataInicial, DataFinal = DataFinal });
 
                 AuthResponseObjHelper authResult = await this._currencyQuotationServices.SelectCurrencyQuotationSevice(currencyQuotationModel);
 
