@@ -16,11 +16,7 @@ namespace BrazilianCentralBank.Infrastructure.Data {
 
         public CurrencyQuotationRepository(IRepositoryBase repositoryBase) {
             this._repositoryBase = repositoryBase;
-        }
-
-        public Task<List<Currency>> SelectCurrency(Currency currency) {
-            throw new NotImplementedException();
-        }
+        }   
 
         public async Task<List<CurrencyQuotation>> SelectCurrencyQuotation(CurrencyQuotation currencyQuotation) {
             try {
@@ -28,16 +24,16 @@ namespace BrazilianCentralBank.Infrastructure.Data {
                 string lstrWhere = string.Empty;
 
                 using (var connection = new SqlConnection(this._repositoryBase.ConnectionString)) {
-                    lstrSelect = $" select                                  " + Environment.NewLine + 
-                                    "convert(nvarchar(50), CQ.Id) as Id,    " + Environment.NewLine +
-                                    "CQ.Simbolo as Simbolo,                 " + Environment.NewLine +
-                                    "CQ.ParidadeCompra as ParidadeCompra,   " + Environment.NewLine +
-                                    "CQ.CotacaoVenda as CotacaoVenda,       " + Environment.NewLine +
-                                    "CQ.CotacaoCompra as CotacaoCompra,     " + Environment.NewLine +
-                                    "CQ.CotacaoVenda as CotacaoVenda,       " + Environment.NewLine +
-                                    "CQ.DataHoraCotacao as DataHoraCotacao, " + Environment.NewLine +
-                                    "CQ.TipoBoletim as TipoBoletim          " + Environment.NewLine +
-                                    "from CurrencyQuotation CQ              " + Environment.NewLine ;
+                    lstrSelect = $" select                                              " + Environment.NewLine +
+                                    "convert(nvarchar(50), CQ.[Id]) as Id,              " + Environment.NewLine +
+                                    "CQ.[Simbolo]                   as Simbolo,         " + Environment.NewLine +
+                                    "CQ.[ParidadeCompra]            as ParidadeCompra,  " + Environment.NewLine +
+                                    "CQ.[CotacaoVenda]              as CotacaoVenda,    " + Environment.NewLine +
+                                    "CQ.[CotacaoCompra]             as CotacaoCompra,   " + Environment.NewLine +
+                                    "CQ.[CotacaoVenda]              as CotacaoVenda,    " + Environment.NewLine +
+                                    "CQ.[DataHoraCotacao]           as DataHoraCotacao, " + Environment.NewLine +
+                                    "CQ.[TipoBoletim]               as TipoBoletim      " + Environment.NewLine +
+                                    "from [CurrencyQuotation] CQ                        " + Environment.NewLine;
 
                     lstrWhere = getWhereFilter(currencyQuotation);
 
@@ -60,13 +56,13 @@ namespace BrazilianCentralBank.Infrastructure.Data {
                 if (currencyQuotation.Simbolo != String.Empty)
                     lstrWhere = $" CQ.[Simbolo] = '{currencyQuotation.Simbolo}'" + Environment.NewLine;
 
-                if (currencyQuotation.DataInicial != null && currencyQuotation.DataFinal != null) {
+                if (currencyQuotation.DataInicial != DateTime.MinValue && currencyQuotation.DataFinal != DateTime.MinValue) {
                     if (lstrWhere != string.Empty)
                         lstrWhere += " and ";
 
                     lstrWhere += $"CQ.[DataHoraCotacao] BETWEEN " + Environment.NewLine;
-                    lstrWhere += $"convert(datetime,  '{currencyQuotation.DataInicial.ToString("yyyy-MM-dd 00:00:00")}',101) " + Environment.NewLine;
-                    lstrWhere += $"and convert(datetime,  '{currencyQuotation.DataFinal.ToString("yyyy-MM-dd 00:00:00")}',101) " + Environment.NewLine;
+                    lstrWhere += $"convert(datetime,  '{currencyQuotation.DataInicial.ToString("yyyy-MM-dd 00:00:00")}',101)  " + Environment.NewLine;
+                    lstrWhere += $"and convert(datetime,  '{currencyQuotation.DataFinal.ToString("yyyy-MM-dd 23:59:59")}',101)" + Environment.NewLine;
                 }
 
                 return lstrWhere;

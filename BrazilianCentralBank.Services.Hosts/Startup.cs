@@ -19,6 +19,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using BrazilianCentralBank.Infrastructure.Data.Interfaces;
 using BrazilianCentralBank.Infrastructure.Data.Base;
 using BrazilianCentralBank.Infrastructure.Data;
+using BrazilianCentralBank.Domain.Entities;
+using BrazilianCentralBank.Application.ViewModels;
+using BrazilianCentralBank.Application.Interfaces;
+using BrazilianCentralBank.Application;
+using BrazilianCentralBank.Services.Hosts.Command;
 
 namespace BrazilianCentralBank.Services.Hosts {
     public class Startup {
@@ -58,16 +63,20 @@ namespace BrazilianCentralBank.Services.Hosts {
         }
 
         private void ConfigureDI(IServiceCollection services) {
-            services.AddSingleton<IRepositoryBase>(ctx => new RepositoryBase(connectionString: Configuration.GetConnectionString("DBConnection")));
+            services.AddSingleton<IRepositoryBase>(ctx => new RepositoryBase(connectionString: Configuration.GetConnectionString("DbConnection")));  
             services.AddScoped<ICurrencyQuotationRepository, CurrencyQuotationRepository>();
+            services.AddScoped<ICurrencyQuotationServices, CurrencyQuotationServices>();
+            services.AddScoped<ICurrencyRepository, CurrencyRepository>();
+            services.AddScoped<ICurrencyServices, CurrencyServices>();
 
         }
 
         private void ConfigureAutoMapper(IServiceCollection services) {
             MapperConfiguration AutoMapperConfig = new AutoMapper.MapperConfiguration(cfg => {
-                //cfg.CreateMap<CityCommand, CityViewModel>().ReverseMap();
-         
-
+                cfg.CreateMap<Currency, CurrencyViewModel>().ReverseMap();
+                cfg.CreateMap<CurrencyCommand, CurrencyViewModel>().ReverseMap();
+                cfg.CreateMap<CurrencyQuotation, CurrencyQuotationViewModel>().ReverseMap();
+                cfg.CreateMap<CurrencyQuotationCommand, CurrencyQuotationViewModel>().ReverseMap();
             });
 
             IMapper mapper = AutoMapperConfig.CreateMapper();
@@ -86,15 +95,15 @@ namespace BrazilianCentralBank.Services.Hosts {
 
             app.UseRouting();
 
+            app.UseCors("Cors"); // CORS
+
             app.UseAuthorization();
+
+            app.UseAuthentication();
 
             app.UseEndpoints(endpoints => {
                 endpoints.MapControllers();
             });
-
-            app.UseCors("Cors"); // CORS
-
-            app.UseAuthentication();
         }
     }
 }
