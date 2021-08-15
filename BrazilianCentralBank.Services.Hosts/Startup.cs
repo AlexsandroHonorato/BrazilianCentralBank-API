@@ -16,6 +16,7 @@ using System.Threading.Tasks;
 using System.IO;
 using AutoMapper;
 using System.Reflection;
+using Microsoft.OpenApi.Models;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -130,6 +131,31 @@ namespace BrazilianCentralBank.Services.Hosts {
 
                 options.IncludeXmlComments(xmlCommentsFullPath);
 
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme() {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = $"JWT Authorization header using the Bearer scheme."+
+                   "\r\n\r\n Enter 'Bearer'[space] and then your token in the text input below."+
+                    "\r\n\r\nExample: \"Bearer 12345abcdef\"",
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                          new OpenApiSecurityScheme
+                          {
+                              Reference = new OpenApiReference
+                              {
+                                  Type = ReferenceType.SecurityScheme,
+                                  Id = "Bearer"
+                              }
+                          },
+                         new string[] {}
+                    }
+                });
             });
         }
 
