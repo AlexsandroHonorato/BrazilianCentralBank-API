@@ -114,11 +114,11 @@ namespace BrazilianCentralBank.Services.Hosts {
                         Version = descriptionVersion.ApiVersion.ToString(),
                         TermsOfService = new Uri("http://ArquiVaiSeusTermosDeUso.com.br"),
                         Description = "API Desenvolvida Para Pegar as Taxas de Cotações",
-                        License = new Microsoft.OpenApi.Models.OpenApiLicense {
-                            Name = "BancoCentralDoBrasil License",
+                        License = new OpenApiLicense {
+                            Name = "Banco Central do Brasil License",
                             Url = new Uri("http://minhaslicensas.com")
                         },
-                        Contact = new Microsoft.OpenApi.Models.OpenApiContact {
+                        Contact = new OpenApiContact {
                             Name = "Desenvolvido por Alexsandro Honorato",
                             Email = "alexsandrohonorato@gmail.com",
                             Url = new Uri("https://www.linkedin.com/in/alexsandro-honorato-da-silva-62480825/")
